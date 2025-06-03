@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Table from "./components/Table";
+import { toast, ToastContainer } from "react-toastify";
 
 const App = () => {
   const [user, setUser] = useState({});
@@ -11,7 +12,7 @@ const App = () => {
   const [isEditId, setEditId] = useState("");
   const URL = "http://localhost:3000/users";
 
-   const navigator = useNavigate();
+  const navigator = useNavigate();
 
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -33,12 +34,14 @@ const App = () => {
     if (isEditId === "") {
       let res = await axios.post(URL, { ...user, id: String(Date.now()) });
       let data = res.data;
+      toast.success("User Added Successfully..!");
       handleFetch();
     } else {
       let res = await axios.put(`${URL}/${isEditId}`, { ...user });
       let data = res.data;
       handleFetch();
-      navigator("/table")
+      toast.info("User Edited Successfully..!");
+      navigator("/table");
     }
     setUser({});
   };
@@ -47,12 +50,13 @@ const App = () => {
     let user = users.find((user) => user.id === id);
     setUser(user);
     setEditId(id);
-    navigator("/")
+    navigator("/");
   };
 
   const handleDelete = async (id) => {
     await axios.delete(`${URL}/${id}`);
     setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+    toast.warn("User Deleted Successfully..!");
     handleFetch();
   };
   return (
@@ -80,6 +84,18 @@ const App = () => {
           }
         />
       </Routes>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </>
   );
 };
